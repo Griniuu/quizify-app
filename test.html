@@ -1,0 +1,14 @@
+<!doctype html><html><body>
+<div id="btn"></div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  window.onload = () => {
+    google.accounts.id.initialize({
+      client_id: "<TWÓJ CLIENT ID>",
+      callback: (r)=>{ console.log('OK', r.credential.slice(0,20)+'...') }
+    });
+    google.accounts.id.renderButton(document.getElementById('btn'), { theme:'outline', size:'large' });
+    google.accounts.id.prompt();
+  };
+</script>
+</body></html>
