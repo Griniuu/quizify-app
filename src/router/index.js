@@ -1,30 +1,169 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
+import RegisterView from '../views/RegisterView.vue'
 import QuizView from '../views/QuizView.vue'
 import CreateView from '../views/CreateView.vue'
 import RankingView from '../views/RankingView.vue'
-import { useAuth } from '../store/auth.js'
-
+import { authGuard, guestGuard, logRouteAccess } from './guards.js'
 
 const routes = [
-{ path: '/', name: 'home', component: LoginView },
-{ path: '/login', redirect: '/' },
-{ path: '/quiz', component: QuizView, meta: { requiresAuth: true } },
-{ path: '/create', component: CreateView, meta: { requiresAuth: true } },
-{ path: '/ranking', component: RankingView, meta: { requiresAuth: true } },
-{ path: '/:pathMatch(.*)*', component: { template: '<div class="py-5">404</div>' } },
+  // Public routes
+  { 
+    path: '/', 
+    name: 'home', 
+    component: LoginView,
+    beforeEnter: guestGuard,
+    meta: { 
+      title: 'Quizify - Logowanie',
+      description: 'Zaloguj się do aplikacji Quizify'
+    }
+  },
+  { 
+    path: '/login', 
+    name: 'login', 
+    component: LoginView,
+    beforeEnter: guestGuard,
+    meta: { 
+      title: 'Logowanie - Quizify',
+      description: 'Zaloguj się do swojego konta'
+    }
+  },
+  { 
+    path: '/register', 
+    name: 'register', 
+    component: RegisterView,
+    beforeEnter: guestGuard,
+    meta: { 
+      title: 'Rejestracja - Quizify',
+      description: 'Utwórz nowe konto'
+    }
+  },
+
+  // Protected routes - require authentication
+  { 
+    path: '/quiz', 
+    name: 'quiz',
+    component: QuizView, 
+    meta: { 
+      requiresAuth: true,
+      title: 'Quiz - Quizify',
+      description: 'Rozwiązuj quizy i zdobywaj punkty',
+      permissions: ['quiz.play'] // Optional: specific permissions
+    }
+  },
+  { 
+    path: '/create', 
+    name: 'create',
+    component: CreateView, 
+    meta: { 
+      requiresAuth: true,
+      title: 'Twórz Quiz - Quizify',
+      description: 'Twórz własne zestawy pytań',
+      permissions: ['quiz.create'] // Optional: specific permissions
+    }
+  },
+  { 
+    path: '/ranking', 
+    name: 'ranking',
+    component: RankingView, 
+    meta: { 
+      requiresAuth: true,
+      title: 'Ranking - Quizify',
+      description: 'Zobacz najlepszych graczy',
+      permissions: ['ranking.view'] // Optional: specific permissions
+    }
+  },
+
+  // Admin routes (example)
+  { 
+    path: '/admin', 
+    name: 'admin',
+    component: () => import('../views/AdminView.vue'), // Lazy loading
+    meta: { 
+      requiresAuth: true,
+      title: 'Panel Admin - Quizify',
+      permissions: ['admin'],
+      requireAllPermissions: true
+    }
+  },
+
+  // Error routes
+  { 
+    path: '/403', 
+    name: 'forbidden',
+    component: { 
+      template: `
+        <div class="py-5 text-center">
+          <h2>403 - Brak uprawnień</h2>
+          <p>Nie masz uprawnień do tej strony.</p>
+          <RouterLink to="/" class="btn btn-primary">Powrót na stronę główną</RouterLink>
+        </div>
+      `
+    },
+    meta: { title: '403 - Brak uprawnień' }
+  },
+  { 
+    path: '/maintenance', 
+    name: 'maintenance',
+    component: { 
+      template: `
+        <div class="py-5 text-center">
+          <h2>🔧 Tryb konserwacji</h2>
+          <p>Aplikacja jest obecnie w trybie konserwacji. Spróbuj ponownie później.</p>
+        </div>
+      `
+    },
+    meta: { title: 'Tryb konserwacji' }
+  },
+
+  // 404 - must be last
+  { 
+    path: '/:pathMatch(.*)*', 
+    name: 'notFound',
+    component: { 
+      template: `
+        <div class="py-5 text-center">
+          <h2>404 - Strona nie znaleziona</h2>
+          <p>Strona, której szukasz, nie istnieje.</p>
+          <RouterLink to="/" class="btn btn-primary">Powrót na stronę główną</RouterLink>
+        </div>
+      `
+    },
+    meta: { title: '404 - Strona nie znaleziona' }
+  }
 ]
 
 
-const router = createRouter({ history: createWebHistory('/'), routes })
+const router = createRouter({ 
+  history: createWebHistory('/'), 
+  routes,
+  // Global route configuration
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
+})
 
+// Global guards
+router.beforeEach(logRouteAccess) // Log all route access
+router.beforeEach(authGuard) // Main authentication guard
 
-router.beforeEach(async (to, from) => {
-const { ensureSession, store } = useAuth()
-await ensureSession()
-if (to.meta.requiresAuth && !store.isAuth) {
-return { path: '/login', query: { r: to.fullPath } }
-}
+// Update document title based on route meta
+router.afterEach((to) => {
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+  
+  // Update meta description
+  if (to.meta.description) {
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', to.meta.description)
+    }
+  }
 })
 
 
