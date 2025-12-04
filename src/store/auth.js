@@ -325,12 +325,12 @@ export async function logout(){
   state.permissions = []
   state.lastActivity = null
   
-  // Optional: Call logout API endpoint
-  try {
-    await authAPI.logout()
-  } catch (error) {
-    console.warn('Logout API call failed:', error)
-  }
+  // API logout wyłączone - aplikacja działa w trybie mock (bez backendu)
+  // try {
+  //   await authAPI.logout()
+  // } catch (error) {
+  //   console.warn('Logout API call failed:', error)
+  // }
 }
 
 export function setNick(v){
@@ -385,6 +385,7 @@ export function useAuth(){
       get account(){ return state.account },
       get username(){ return state.account?.email },
       get name(){ return state.account?.name },
+      get sub(){ return state.account?.sub },
       get nick(){ return state.nick },
       get token(){ return state.idToken },
       get refreshToken(){ return state.refreshToken },

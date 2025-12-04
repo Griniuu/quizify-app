@@ -1,38 +1,45 @@
 <template>
-<div class="card shadow rounded-4 mt-3">
-<div class="card-body">
-<h2 class="h5 mb-3">Ustaw nick</h2>
-<div class="row g-2 align-items-end">
-<div class="col-sm-6">
-<label class="form-label" for="nick">Nick widoczny w rankingu</label>
-<input 
-  id="nick" 
-  v-model.trim="nick" 
-  class="form-control" 
-  :class="{ 'is-invalid': error, 'is-valid': nick && !error && nick.length >= 3 }"
-  placeholder="np. NightHunter" 
-  minlength="3" 
-  maxlength="24"
-  @input="validateNick"
-  @blur="validateNick"
-/>
-<div class="form-text">3–24 znaki, tylko litery, cyfry, podkreślniki i myślniki.</div>
-<div v-if="error" class="invalid-feedback d-block">{{ error }}</div>
-<div v-else-if="nick && isValid" class="valid-feedback d-block">Nick jest poprawny!</div>
-</div>
-<div class="col-sm-auto">
-<button 
-  class="btn btn-warning" 
-  :disabled="!isValid || loading"
-  @click="save"
->
-  <span v-if="loading" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-  {{ loading ? 'Zapisywanie...' : 'Zapisz' }}
-</button>
-<button class="btn btn-secondary ms-2" @click="$emit('close')">Zamknij</button>
-</div>
-</div>
-</div>
+<!-- Modal backdrop -->
+<div class="modal-backdrop fade show" @click="$emit('close')"></div>
+
+<!-- Modal -->
+<div class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ustaw nick</h5>
+        <button type="button" class="btn-close" @click="$emit('close')"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" for="nick">Nick widoczny w rankingu</label>
+        <input 
+          id="nick" 
+          v-model.trim="nick" 
+          class="form-control" 
+          :class="{ 'is-invalid': error, 'is-valid': nick && !error && nick.length >= 3 }"
+          placeholder="np. NightHunter" 
+          minlength="3" 
+          maxlength="24"
+          @input="validateNick"
+          @blur="validateNick"
+        />
+        <div class="form-text">3–24 znaki, tylko litery, cyfry, podkreślniki i myślniki.</div>
+        <div v-if="error" class="invalid-feedback d-block">{{ error }}</div>
+        <div v-else-if="nick && isValid" class="valid-feedback d-block">Nick jest poprawny!</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="$emit('close')">Zamknij</button>
+        <button 
+          class="btn btn-warning" 
+          :disabled="!isValid || loading"
+          @click="save"
+        >
+          <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ loading ? 'Zapisywanie...' : 'Zapisz' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
 

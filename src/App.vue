@@ -16,16 +16,24 @@
 <script setup>
 import { useAuth } from './store/auth.js'
 import { useSession } from './composables/useSession.js'
+import { useRouter } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 import NickPanel from './components/NickPanel.vue'
 import SessionDebug from './components/SessionDebug.vue'
 import { ref, onMounted } from 'vue'
 
-const { store, login, logout } = useAuth()
+const { store, login, logout: authLogout } = useAuth()
 const session = useSession()
+const router = useRouter()
 const showNick = ref(false)
 
 const toggleNick = () => { if (store.isAuth) showNick.value = true }
+
+// Obsługa wylogowania z przekierowaniem
+async function logout() {
+  await authLogout()
+  router.push('/login')
+}
 
 // Initialize session monitoring
 onMounted(() => {

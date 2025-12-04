@@ -88,10 +88,9 @@
 
 <!-- Przyciski nawigacji (widoczne po zalogowaniu) -->
 <div v-if="store.isAuth" class="d-flex gap-2">
-<RouterLink class="btn btn-success" to="/quiz">Start quizu</RouterLink>
+<RouterLink class="btn btn-success" to="/home">Strona główna</RouterLink>
 <RouterLink class="btn btn-outline-success" to="/create">Utwórz zestaw</RouterLink>
 <RouterLink class="btn btn-outline-info" to="/ranking">Ranking</RouterLink>
-<button class="btn btn-outline-danger" @click="handleLogout">Wyloguj</button>
 </div>
 
 </div>
@@ -102,7 +101,7 @@
 
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { reactive, ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../store/auth.js'
 import { useErrors } from '../store/errors.js'
@@ -111,6 +110,13 @@ import { authAPI } from '../services/api.js'
 const router = useRouter()
 const { store, login, logout } = useAuth()
 const errorStore = useErrors()
+
+// Obserwuj stan zalogowania i przekieruj jeśli już zalogowany
+watch(() => store.isAuth, (isAuth) => {
+  if (isAuth) {
+    router.push('/home')
+  }
+}, { immediate: true })
 
 // Stan formularza logowania email/hasło
 const loginForm = reactive({
@@ -175,7 +181,7 @@ async function handleEmailLogin() {
     errorStore.showSuccess('Zalogowano pomyślnie!')
     
     // Przekieruj na główną stronę
-    router.push('/quiz')
+    router.push('/home')
     
   } catch (error) {
     errorStore.showError(error.message || 'Błąd podczas logowania')
@@ -194,9 +200,9 @@ async function handleGoogleLogin() {
   
   try {
     await login()
-    // Jeśli logowanie się powiodło, użytkownik zostanie automatycznie przekierowany
-    // dzięki watcher w auth store lub router guard
     errorStore.showSuccess('Zalogowano pomyślnie przez Google!')
+    // Przekieruj do strony głównej po zalogowaniu
+    router.push('/home')
   } catch (error) {
     // Nie pokazuj błędu jeśli użytkownik anulował
     if (!error.message.includes('anulowane') && !error.message.includes('przerwane')) {
@@ -213,15 +219,6 @@ function cancelGoogleLogin() {
     loginAbortController.abort()
     googleLoading.value = false
     loginAbortController = null
-  }
-}
-
-async function handleLogout() {
-  try {
-    await logout()
-    errorStore.showInfo('Wylogowano pomyślnie')
-  } catch (error) {
-    errorStore.showError('Błąd podczas wylogowywania')
   }
 }
 </script>

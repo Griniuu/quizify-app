@@ -49,6 +49,10 @@ api.interceptors.response.use(
         case 404:
           throw new Error('Nie znaleziono zasobu.')
           
+        case 409:
+          // Konflikt - zajęty email lub nick
+          throw new Error(data.message || 'Email lub nick jest już zajęty.')
+          
         case 422:
           // Błędy walidacji z serwera
           if (data.errors) {
