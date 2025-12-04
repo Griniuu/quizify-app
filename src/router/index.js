@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import HomeView from '../views/HomeView.vue'
 import QuizView from '../views/QuizView.vue'
+import QuizListView from '../views/QuizListView.vue'
 import CreateView from '../views/CreateView.vue'
 import RankingView from '../views/RankingView.vue'
 import { authGuard, guestGuard, logRouteAccess } from './guards.js'
@@ -10,7 +12,7 @@ const routes = [
   // Public routes
   { 
     path: '/', 
-    name: 'home', 
+    name: 'root', 
     component: LoginView,
     beforeEnter: guestGuard,
     meta: { 
@@ -41,14 +43,44 @@ const routes = [
 
   // Protected routes - require authentication
   { 
+    path: '/home', 
+    name: 'home',
+    component: HomeView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Strona główna - Quizify',
+      description: 'Panel główny aplikacji'
+    }
+  },
+  { 
+    path: '/quizzes', 
+    name: 'quiz-list',
+    component: QuizListView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Lista Quizów - Quizify',
+      description: 'Przeglądaj dostępne quizy'
+    }
+  },
+  { 
     path: '/quiz', 
     name: 'quiz',
     component: QuizView, 
     meta: { 
       requiresAuth: true,
       title: 'Quiz - Quizify',
-      description: 'Rozwiązuj quizy i zdobywaj punkty',
-      permissions: ['quiz.play'] // Optional: specific permissions
+      description: 'Rozwiązuj quizy i zdobywaj punkty'
+      // Tymczasowo wyłączone: permissions: ['quiz.play']
+    }
+  },
+  { 
+    path: '/quiz/:id', 
+    name: 'quiz-detail',
+    component: QuizView, 
+    meta: { 
+      requiresAuth: true,
+      title: 'Quiz - Quizify',
+      description: 'Rozwiązuj quizy i zdobywaj punkty'
     }
   },
   { 
@@ -58,8 +90,8 @@ const routes = [
     meta: { 
       requiresAuth: true,
       title: 'Twórz Quiz - Quizify',
-      description: 'Twórz własne zestawy pytań',
-      permissions: ['quiz.create'] // Optional: specific permissions
+      description: 'Twórz własne zestawy pytań'
+      // Tymczasowo wyłączone: permissions: ['quiz.create']
     }
   },
   { 
@@ -69,8 +101,8 @@ const routes = [
     meta: { 
       requiresAuth: true,
       title: 'Ranking - Quizify',
-      description: 'Zobacz najlepszych graczy',
-      permissions: ['ranking.view'] // Optional: specific permissions
+      description: 'Zobacz najlepsze wyniki'
+      // Tymczasowo wyłączone: permissions: ['ranking.view']
     }
   },
 

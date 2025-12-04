@@ -41,7 +41,7 @@ export async function authGuard(to, from, next) {
     if (to.meta.requiresAuth) {
       if (!isAuthenticated) {
         // Store the intended destination
-        const redirectPath = to.fullPath !== '/' ? to.fullPath : '/quiz'
+        const redirectPath = to.fullPath !== '/' ? to.fullPath : '/home'
         
         next({
           path: '/login',
@@ -63,8 +63,8 @@ export async function authGuard(to, from, next) {
     }
     
     // Redirect authenticated users away from login/register pages
-    if ((to.name === 'login' || to.name === 'register') && isAuthenticated) {
-      const redirectTo = to.query.redirect || '/quiz'
+    if ((to.name === 'login' || to.name === 'register' || to.name === 'root') && isAuthenticated) {
+      const redirectTo = to.query.redirect || '/home'
       next({
         path: redirectTo,
         replace: true
@@ -103,7 +103,7 @@ export async function guestGuard(to, from, next) {
     const isAuthenticated = await auth.ensureSession()
     
     if (isAuthenticated) {
-      const redirectTo = to.query.redirect || '/quiz'
+      const redirectTo = to.query.redirect || '/home'
       next({
         path: redirectTo,
         replace: true
