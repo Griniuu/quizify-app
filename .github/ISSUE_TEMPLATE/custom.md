@@ -7,4 +7,8 @@ assignees: ''
 
 ---
 
+### Opis:
 
+
+
+### Kryteria akceptacji:
