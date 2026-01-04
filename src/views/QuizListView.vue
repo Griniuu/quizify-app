@@ -7,20 +7,20 @@
       </button>
     </div>
 
-    <!-- Quizy z mock API -->
+    <!-- Quizy z backendu -->
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Quizy dostępne</h4>
         <div class="btn-group">
-          <button 
-            class="btn btn-outline-primary btn-sm" 
+          <button
+            class="btn btn-outline-primary btn-sm"
             @click="previousPage"
             :disabled="currentPage === 0"
           >
             ← Poprzednie
           </button>
-          <button 
-            class="btn btn-outline-primary btn-sm" 
+          <button
+            class="btn btn-outline-primary btn-sm"
             @click="nextPage"
             :disabled="currentPage >= totalPages - 1"
           >
@@ -28,16 +28,27 @@
           </button>
         </div>
       </div>
-      
+
       <div class="row g-3">
-        <div v-for="quiz in paginatedQuizzes" :key="'mock-' + quiz.id" class="col-md-4">
+        <div
+          v-for="quiz in paginatedQuizzes"
+          :key="'mock-' + quiz.id"
+          class="col-md-4"
+        >
           <div class="card h-100 shadow-sm hover-card">
             <div class="card-body">
               <h5 class="card-title">{{ quiz.title }}</h5>
               <p class="card-text text-muted small">{{ quiz.description }}</p>
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="text-muted">{{ quiz.questions.length }} pytań</small>
-                <RouterLink :to="'/quiz/' + quiz.id" class="btn btn-primary btn-sm">
+              <div
+                class="d-flex justify-content-between align-items-center mt-3"
+              >
+                <small class="text-muted">
+                  {{ (quiz.questions && quiz.questions.length) || 0 }} pytań
+                </small>
+                <RouterLink
+                  :to="'/quiz/' + quiz.id"
+                  class="btn btn-primary btn-sm"
+                >
                   Rozpocznij →
                 </RouterLink>
               </div>
@@ -45,11 +56,16 @@
           </div>
         </div>
       </div>
-      
-      <!-- Wskaźnik strony -->
+
+      <!-- Wskaźnik strony / stany -->
       <div class="text-center mt-3">
-        <small class="text-muted">
-          Strona {{ currentPage + 1 }} z {{ totalPages }} ({{ mockQuizzes.length }} quizów)
+        <small v-if="loading" class="text-muted">Ładowanie quizów...</small>
+        <small v-else-if="error" class="text-danger">{{ error }}</small>
+        <small v-else class="text-muted">
+          Strona {{ currentPage + 1 }} z {{ totalPages }} ({{
+            quizzes.length
+          }}
+          quizów)
         </small>
       </div>
     </div>
@@ -58,21 +74,34 @@
     <div v-if="customQuizzes.length > 0">
       <h4 class="mb-3">Twoje quizy</h4>
       <div class="row g-3">
-        <div v-for="quiz in customQuizzes" :key="'custom-' + quiz.id" class="col-md-6">
+        <div
+          v-for="quiz in customQuizzes"
+          :key="'custom-' + quiz.id"
+          class="col-md-6"
+        >
           <div class="card h-100 shadow-sm hover-card border-success">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
                 <h5 class="card-title mb-0">{{ quiz.title }}</h5>
                 <span class="badge bg-success">Własny</span>
               </div>
-              <p class="card-text text-muted">{{ quiz.description || 'Brak opisu' }}</p>
+              <p class="card-text text-muted">
+                {{ quiz.description || "Brak opisu" }}
+              </p>
               <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">{{ quiz.questions.length }} pytań</small>
+                <small class="text-muted"
+                  >{{ quiz.questions.length }} pytań</small
+                >
                 <div class="btn-group">
-                  <RouterLink :to="'/quiz/' + quiz.id" class="btn btn-primary btn-sm">
+                  <RouterLink
+                    :to="'/quiz/' + quiz.id"
+                    class="btn btn-primary btn-sm"
+                  >
                     Rozpocznij →
                   </RouterLink>
-                  <button 
+                  <button
                     class="btn btn-outline-danger btn-sm"
                     @click="deleteQuiz(quiz.id)"
                     title="Usuń quiz"
@@ -89,64 +118,83 @@
 
     <!-- Brak własnych quizów -->
     <div v-else class="alert alert-info">
-      <strong>Brak własnych quizów.</strong> Utwórz swój pierwszy quiz klikając 
+      <strong>Brak własnych quizów.</strong> Utwórz swój pierwszy quiz klikając
       <RouterLink to="/create">tutaj</RouterLink>.
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { mockQuizzes } from '../services/mockApi'
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { quizAPI } from "../services/api.js";
 
-const router = useRouter()
-const customQuizzes = ref([])
-const currentPage = ref(0)
-const quizzesPerPage = 3
+const router = useRouter();
+const customQuizzes = ref([]);
+const quizzes = ref([]);
+const loading = ref(false);
+const error = ref(null);
+const currentPage = ref(0);
+const quizzesPerPage = 3;
 
 // Oblicz całkowitą liczbę stron
-const totalPages = computed(() => Math.ceil(mockQuizzes.length / quizzesPerPage))
+const totalPages = computed(() =>
+  Math.ceil(quizzes.value.length / quizzesPerPage)
+);
 
 // Pobierz quizy dla aktualnej strony
 const paginatedQuizzes = computed(() => {
-  const start = currentPage.value * quizzesPerPage
-  const end = start + quizzesPerPage
-  return mockQuizzes.slice(start, end)
-})
+  const start = currentPage.value * quizzesPerPage;
+  const end = start + quizzesPerPage;
+  return quizzes.value.slice(start, end);
+});
 
 function nextPage() {
   if (currentPage.value < totalPages.value - 1) {
-    currentPage.value++
+    currentPage.value++;
   }
 }
 
 function previousPage() {
   if (currentPage.value > 0) {
-    currentPage.value--
+    currentPage.value--;
+  }
+}
+
+async function loadQuizzes() {
+  loading.value = true;
+  error.value = null;
+  try {
+    const { data } = await quizAPI.getQuizzes();
+    quizzes.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    error.value = e.message || "Nie udało się pobrać listy quizów";
+  } finally {
+    loading.value = false;
   }
 }
 
 function loadCustomQuizzes() {
-  const stored = localStorage.getItem('custom_quizzes')
-  customQuizzes.value = stored ? JSON.parse(stored) : []
+  const stored = localStorage.getItem("custom_quizzes");
+  customQuizzes.value = stored ? JSON.parse(stored) : [];
 }
 
 function deleteQuiz(quizId) {
-  if (confirm('Czy na pewno chcesz usunąć ten quiz?')) {
-    const quizzes = customQuizzes.value.filter(q => q.id !== quizId)
-    localStorage.setItem('custom_quizzes', JSON.stringify(quizzes))
-    loadCustomQuizzes()
+  if (confirm("Czy na pewno chcesz usunąć ten quiz?")) {
+    const quizzes = customQuizzes.value.filter((q) => q.id !== quizId);
+    localStorage.setItem("custom_quizzes", JSON.stringify(quizzes));
+    loadCustomQuizzes();
   }
 }
 
 function goBack() {
-  router.push('/home')
+  router.push("/home");
 }
 
 onMounted(() => {
-  loadCustomQuizzes()
-})
+  loadCustomQuizzes();
+  loadQuizzes();
+});
 </script>
 
 <style scoped>
@@ -157,7 +205,7 @@ onMounted(() => {
 
 .hover-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 .card {

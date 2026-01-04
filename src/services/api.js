@@ -50,7 +50,7 @@ api.interceptors.response.use(
           throw new Error("Brak uprawnień do wykonania tej operacji.");
 
         case 404:
-          throw new Error("Nie znaleziono zasobu.");
+          throw new Error((data && data.message) || "Nie znaleziono zasobu.");
 
         case 409:
           // Konflikt - zajęty email lub nick
@@ -68,7 +68,9 @@ api.interceptors.response.use(
           throw new Error("Zbyt wiele żądań. Spróbuj ponownie za chwilę.");
 
         case 500:
-          throw new Error("Błąd serwera. Spróbuj ponownie później.");
+          throw new Error(
+            (data && data.message) || "Błąd serwera. Spróbuj ponownie później."
+          );
 
         default:
           throw new Error(data.message || `Błąd HTTP ${status}`);
@@ -98,6 +100,7 @@ export const authAPI = {
 export const quizAPI = {
   getQuizzes: () => api.get("/quizzes"),
   getQuiz: (id) => api.get(`/quizzes/${id}`),
+  answerQuiz: (id, data) => api.post(`/quizzes/${id}/answer`, data),
   createQuiz: (data) => api.post("/quizzes", data),
   updateQuiz: (id, data) => api.put(`/quizzes/${id}`, data),
   deleteQuiz: (id) => api.delete(`/quizzes/${id}`),
