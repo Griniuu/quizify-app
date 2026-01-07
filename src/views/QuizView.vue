@@ -401,7 +401,8 @@ async function finishQuiz() {
     showResults.value = true;
     console.log("Wyniki quizu:", results.value);
   } catch (err) {
-    error.value = err?.message || "Nie udało się wysłać odpowiedzi. Spróbuj ponownie.";
+    error.value =
+      err?.message || "Nie udało się wysłać odpowiedzi. Spróbuj ponownie.";
     console.error("Błąd wysyłania odpowiedzi:", err);
   } finally {
     submitting.value = false;

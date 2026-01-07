@@ -6,14 +6,17 @@
         ← Powrót
       </RouterLink>
     </div>
-    
+
     <!-- Globalny ranking -->
     <div class="card shadow mb-4">
       <div class="card-header bg-primary text-white">
         <h5 class="mb-0">Top 10 Graczy</h5>
       </div>
       <div class="card-body">
-        <div v-if="globalRankings.length === 0" class="text-center text-muted py-4">
+        <div
+          v-if="globalRankings.length === 0"
+          class="text-center text-muted py-4"
+        >
           Brak wyników. Rozwiąż quiz aby pojawić się w rankingu!
         </div>
         <table v-else class="table table-hover">
@@ -27,8 +30,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="(user, index) in globalRankings" 
+            <tr
+              v-for="(user, index) in globalRankings"
               :key="user.userId"
               :class="{ 'table-success': user.userId === store.sub }"
             >
@@ -41,7 +44,11 @@
               <td>
                 <div class="d-flex align-items-center">
                   <span class="me-2">{{ user.userNick || user.userName }}</span>
-                  <span v-if="user.userId === store.sub" class="badge bg-success">Ty</span>
+                  <span
+                    v-if="user.userId === store.sub"
+                    class="badge bg-success"
+                    >Ty</span
+                  >
                 </div>
               </td>
               <td class="text-center">{{ user.quizzesCompleted }}</td>
@@ -63,31 +70,42 @@
         <h5 class="mb-0">Twoje Statystyki</h5>
       </div>
       <div class="card-body">
-        <div v-if="userStats.totalQuizzes === 0" class="text-center text-muted py-4">
+        <div
+          v-if="userStats.totalQuizzes === 0"
+          class="text-center text-muted py-4"
+        >
           Nie rozwiązałeś jeszcze żadnego quizu!
         </div>
         <div v-else class="row g-3">
           <div class="col-md-3">
-            <div class="stat-box text-center p-3 bg-primary bg-opacity-10 rounded">
+            <div
+              class="stat-box text-center p-3 bg-primary bg-opacity-10 rounded"
+            >
               <div class="h3 mb-1">{{ userStats.totalQuizzes }}</div>
               <div class="text-muted small">Rozwiązanych quizów</div>
             </div>
           </div>
           <div class="col-md-3">
-            <div class="stat-box text-center p-3 bg-success bg-opacity-10 rounded">
+            <div
+              class="stat-box text-center p-3 bg-success bg-opacity-10 rounded"
+            >
               <div class="h3 mb-1">{{ userStats.averageScore }}%</div>
               <div class="text-muted small">Średni wynik</div>
             </div>
           </div>
           <div class="col-md-3">
-            <div class="stat-box text-center p-3 bg-warning bg-opacity-10 rounded">
+            <div
+              class="stat-box text-center p-3 bg-warning bg-opacity-10 rounded"
+            >
               <div class="h3 mb-1">{{ userStats.bestScore }}%</div>
               <div class="text-muted small">Najlepszy wynik</div>
             </div>
           </div>
           <div class="col-md-3">
             <div class="stat-box text-center p-3 bg-info bg-opacity-10 rounded">
-              <div class="h3 mb-1">{{ userStats.totalCorrect }}/{{ userStats.totalQuestions }}</div>
+              <div class="h3 mb-1">
+                {{ userStats.totalCorrect }}/{{ userStats.totalQuestions }}
+              </div>
               <div class="text-muted small">Poprawne odpowiedzi</div>
             </div>
           </div>
@@ -101,27 +119,32 @@
         <h5 class="mb-0">⭐ Najpopularniejsze Quizy</h5>
       </div>
       <div class="card-body">
-        <div v-if="popularQuizzes.length === 0" class="text-center text-muted py-4">
+        <div
+          v-if="popularQuizzes.length === 0"
+          class="text-center text-muted py-4"
+        >
           Brak danych o quizach
         </div>
         <div v-else class="list-group list-group-flush">
-          <div 
-            v-for="(quiz, index) in popularQuizzes" 
+          <div
+            v-for="(quiz, index) in popularQuizzes"
             :key="quiz.quizId"
             class="list-group-item d-flex justify-content-between align-items-center"
           >
             <div class="d-flex align-items-center">
-              <span class="badge bg-warning text-dark me-3 fs-6">{{ index + 1 }}</span>
+              <span class="badge bg-warning text-dark me-3 fs-6">{{
+                index + 1
+              }}</span>
               <div>
                 <h6 class="mb-1">{{ quiz.quizTitle }}</h6>
                 <small class="text-muted">
-                  Rozwiązany {{ quiz.timesCompleted }}x • 
-                  Średni wynik: {{ quiz.averageScore }}%
+                  Rozwiązany {{ quiz.timesCompleted }}x • Średni wynik:
+                  {{ quiz.averageScore }}%
                 </small>
               </div>
             </div>
-            <RouterLink 
-              :to="`/quiz/${quiz.quizId}`" 
+            <RouterLink
+              :to="`/quiz/${quiz.quizId}`"
               class="btn btn-sm btn-outline-primary"
             >
               Rozwiąż
@@ -134,52 +157,57 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getGlobalRankings, getUserStats, getMostPopularQuizzes, cleanInvalidRankings } from '../services/rankingService'
-import { useAuth } from '../store/auth.js'
+import { ref, onMounted } from "vue";
+import {
+  getGlobalRankings,
+  getUserStats,
+  getMostPopularQuizzes,
+  cleanInvalidRankings,
+} from "../services/rankingService";
+import { useAuth } from "../store/auth.js";
 
-const { store } = useAuth()
-const globalRankings = ref([])
-const popularQuizzes = ref([])
+const { store } = useAuth();
+const globalRankings = ref([]);
+const popularQuizzes = ref([]);
 const userStats = ref({
   totalQuizzes: 0,
   averageScore: 0,
   bestScore: 0,
   totalCorrect: 0,
-  totalQuestions: 0
-})
+  totalQuestions: 0,
+});
 
 async function loadRankings() {
   // Wyczyść nieprawidłowe wpisy przy pierwszym załadowaniu
-  cleanInvalidRankings()
+  cleanInvalidRankings();
 
   try {
-    const g = await getGlobalRankings(10)
-    globalRankings.value = g
+    const g = await getGlobalRankings(10);
+    globalRankings.value = g;
 
-    const p = await getMostPopularQuizzes(5)
-    popularQuizzes.value = p
+    const p = await getMostPopularQuizzes(5);
+    popularQuizzes.value = p;
 
     if (store.isAuth && store.sub) {
-      userStats.value = await getUserStats(store.sub)
+      userStats.value = await getUserStats(store.sub);
     } else {
       // attempt to fetch stats for anonymous/external id (service will fallback)
-      const s = await getUserStats()
-      userStats.value = s
+      const s = await getUserStats();
+      userStats.value = s;
     }
   } catch (err) {
     // silent fallback: leave arrays empty
-    console.warn("Error loading rankings", err)
+    console.warn("Error loading rankings", err);
   }
 }
 
 function getBadgeClass(score) {
-  if (score >= 80) return 'bg-success'
-  if (score >= 60) return 'bg-warning'
-  return 'bg-danger'
+  if (score >= 80) return "bg-success";
+  if (score >= 60) return "bg-warning";
+  return "bg-danger";
 }
 
-onMounted(loadRankings)
+onMounted(loadRankings);
 </script>
 
 <style scoped>

@@ -178,7 +178,8 @@ export function getGlobalRankings(limit = 10) {
 
       return rankings_array
         .sort(
-          (a, b) => b.averageScore - a.averageScore || b.totalScore - a.totalScore
+          (a, b) =>
+            b.averageScore - a.averageScore || b.totalScore - a.totalScore
         )
         .slice(0, limit);
     });
@@ -188,7 +189,8 @@ export function getGlobalRankings(limit = 10) {
 export function getUserStats(userId) {
   // Prefer backend
   const { store } = useAuth();
-  const effectiveUser = userId || store?.sub || authCookies.getUserData()?.sub || null;
+  const effectiveUser =
+    userId || store?.sub || authCookies.getUserData()?.sub || null;
   return rankingAPI
     .getRanking({ type: "me", userId: effectiveUser })
     .then((res) => res.data)
@@ -208,8 +210,14 @@ export function getUserStats(userId) {
       }
 
       const totalScore = userScores.reduce((sum, s) => sum + s.score, 0);
-      const totalCorrect = userScores.reduce((sum, s) => sum + s.correctAnswers, 0);
-      const totalQuestions = userScores.reduce((sum, s) => sum + s.totalQuestions, 0);
+      const totalCorrect = userScores.reduce(
+        (sum, s) => sum + s.correctAnswers,
+        0
+      );
+      const totalQuestions = userScores.reduce(
+        (sum, s) => sum + s.totalQuestions,
+        0
+      );
       const bestScore = Math.max(...userScores.map((s) => s.score));
 
       return {
