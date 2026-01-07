@@ -32,24 +32,55 @@ export function cleanInvalidRankings() {
 }
 
 // Zapisz wynik do rankingu
+import { rankingAPI } from './api.js'
+import { useAuth } from '../store/auth.js'
+import { authCookies } from '../utils/cookies.js'
+
 export function saveScore(scoreData) {
   const rankings = getRankings()
-  
-  // Walidacja - nie zapisuj jeśli brak userId
+
+  // Jeśli nie podano userId spróbuj pobrać je automatycznie z sesji
   if (!scoreData.userId || scoreData.userId === 'undefined') {
-    console.error('Nie można zapisać wyniku bez prawidłowego userId')
-    return null
+    try {
+      const { store } = useAuth()
+      const cookieUser = authCookies.getUserData()
+      scoreData.userId = store?.sub || cookieUser?.sub || scoreData.userId || null
+    } catch (e) {
+      scoreData.userId = scoreData.userId || null
+    }
   }
-  
+
   const newScore = {
     id: `score_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     ...scoreData,
     timestamp: new Date().toISOString()
   }
-  
+
+  // Zapis lokalny jako fallback
   rankings.push(newScore)
   localStorage.setItem(STORAGE_KEY, JSON.stringify(rankings))
-  
+
+  // Jeśli użytkownik jest zalogowany spróbuj wysłać wynik do backendu
+  try {
+    const { store } = useAuth()
+    if (store.isAuth) {
+      // Backend oczekuje: quizId, percentage, correctAnswers, totalQuestions, passed
+      const payload = {
+        quizId: newScore.quizId,
+        percentage: newScore.score || newScore.percentage || 0,
+        correctAnswers: newScore.correctAnswers,
+        totalQuestions: newScore.totalQuestions,
+        passed: newScore.passed,
+      }
+      // Fire-and-forget; jeśli błąd, pozostanie w localStorage
+      rankingAPI.submitScore(payload).catch((err) => {
+        console.warn('Nie udało się wysłać wyniku do backendu, zapisano lokalnie', err)
+      })
+    }
+  } catch (err) {
+    console.warn('Błąd podczas próby wysyłki wyniku do backendu', err)
+  }
+
   return newScore
 }
 
