@@ -149,15 +149,27 @@ const userStats = ref({
   totalQuestions: 0
 })
 
-function loadRankings() {
+async function loadRankings() {
   // Wyczyść nieprawidłowe wpisy przy pierwszym załadowaniu
   cleanInvalidRankings()
-  
-  globalRankings.value = getGlobalRankings(10)
-  popularQuizzes.value = getMostPopularQuizzes(5)
-  
-  if (store.isAuth && store.sub) {
-    userStats.value = getUserStats(store.sub)
+
+  try {
+    const g = await getGlobalRankings(10)
+    globalRankings.value = g
+
+    const p = await getMostPopularQuizzes(5)
+    popularQuizzes.value = p
+
+    if (store.isAuth && store.sub) {
+      userStats.value = await getUserStats(store.sub)
+    } else {
+      // attempt to fetch stats for anonymous/external id (service will fallback)
+      const s = await getUserStats()
+      userStats.value = s
+    }
+  } catch (err) {
+    // silent fallback: leave arrays empty
+    console.warn("Error loading rankings", err)
   }
 }
 
@@ -167,9 +179,7 @@ function getBadgeClass(score) {
   return 'bg-danger'
 }
 
-onMounted(() => {
-  loadRankings()
-})
+onMounted(loadRankings)
 </script>
 
 <style scoped>

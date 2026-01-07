@@ -282,7 +282,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { quizAPI } from "../services/api.js";
-import { saveScore } from "../services/rankingService";
+import { saveScore, getOrCreateAnonId } from "../services/rankingService";
 import { useAuth } from "../store/auth.js";
 
 const route = useRoute();
@@ -376,32 +376,27 @@ async function finishQuiz() {
   submitting.value = true;
 
   try {
-    // Wyślij odpowiedzi do backendu (mock)
+    // Wyślij odpowiedzi do backendu (dołączając userId aby backend mógł zapisać external_user_id)
+    const effectiveUserId = store?.sub || getOrCreateAnonId();
     const response = await quizAPI.answerQuiz(quiz.value.id, {
       answers: userAnswers.value,
+      userId: effectiveUserId,
     });
     results.value = response.data;
 
     // Zapisz wynik do rankingu
-    if (store.isAuth) {
-      console.log("Zapisywanie wyniku:", {
-        userId: store.sub,
-        userName: store.name || store.email,
-        userNick: store.nick || store.name,
-      });
-
-      saveScore({
-        userId: store.sub,
-        userName: store.name || store.email,
-        userNick: store.nick || store.name,
-        quizId: quiz.value.id,
-        quizTitle: quiz.value.title,
-        score: results.value.percentage,
-        correctAnswers: results.value.correctAnswers,
-        totalQuestions: results.value.totalQuestions,
-        passed: results.value.passed,
-      });
-    }
+    // Always save locally and attempt backend persist. saveScore will attach anon id if needed.
+    saveScore({
+      userId: effectiveUserId,
+      userName: store.name || store.email,
+      userNick: store.nick || store.name,
+      quizId: quiz.value.id,
+      quizTitle: quiz.value.title,
+      score: results.value.percentage,
+      correctAnswers: results.value.correctAnswers,
+      totalQuestions: results.value.totalQuestions,
+      passed: results.value.passed,
+    });
 
     showResults.value = true;
     console.log("Wyniki quizu:", results.value);

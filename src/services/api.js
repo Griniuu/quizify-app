@@ -107,7 +107,7 @@ export const quizAPI = {
 };
 
 export const rankingAPI = {
-  getRanking: () => api.get("/ranking"),
+  getRanking: (params) => api.get("/ranking", { params }),
   submitScore: (data) => api.post("/ranking", data),
 };
 
