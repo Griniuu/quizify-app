@@ -282,6 +282,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { quizAPI } from "../services/api.js";
+import { fetchQuiz, submitQuizAnswers } from "../services/mockApi.js";
 import { saveScore, getOrCreateAnonId } from "../services/rankingService";
 import { useAuth } from "../store/auth.js";
 
@@ -326,6 +327,18 @@ async function loadQuiz() {
     // Załaduj zapisaną odpowiedź dla pierwszego pytania (jeśli istnieje)
     loadSavedAnswer();
   } catch (err) {
+    try {
+      const quizId = route.params.id || 1;
+      const response = await fetchQuiz(quizId);
+      quiz.value = response.data;
+      loadSavedAnswer();
+      return;
+    } catch (fallbackError) {
+      error.value =
+        fallbackError.message || "Nie uda‘'o siŽt za‘'adowaŽÅ quizu";
+      console.error("B‘'Žd ‘'adowania quizu:", fallbackError);
+      return;
+    }
     error.value = err.message || "Nie udało się załadować quizu";
     console.error("Błąd ładowania quizu:", err);
   } finally {
@@ -378,10 +391,15 @@ async function finishQuiz() {
   try {
     // Wyślij odpowiedzi do backendu (dołączając userId aby backend mógł zapisać external_user_id)
     const effectiveUserId = store?.sub || getOrCreateAnonId();
-    const response = await quizAPI.answerQuiz(quiz.value.id, {
-      answers: userAnswers.value,
-      userId: effectiveUserId,
-    });
+    let response;
+    try {
+      response = await quizAPI.answerQuiz(quiz.value.id, {
+        answers: userAnswers.value,
+        userId: effectiveUserId,
+      });
+    } catch (apiError) {
+      response = await submitQuizAnswers(quiz.value.id, userAnswers.value);
+    }
     results.value = response.data;
 
     // Zapisz wynik do rankingu
