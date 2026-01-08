@@ -1,11 +1,7 @@
 <template>
   <!-- Globalny komponent do wyświetlania błędów/powiadomień -->
   <Teleport to="body">
-    <div
-      v-if="errorStore.state.notificationsEnabled"
-      class="error-notifications"
-      style="position: fixed; top: 20px; right: 20px; z-index: 9999;"
-    >
+    <div class="error-notifications" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
       <TransitionGroup name="notification" tag="div">
         <div
           v-for="error in errorStore.state.errors"

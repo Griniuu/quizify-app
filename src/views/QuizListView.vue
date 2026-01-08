@@ -128,7 +128,6 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { quizAPI } from "../services/api.js";
-import { fetchQuizzes } from "../services/mockApi.js";
 
 const router = useRouter();
 const customQuizzes = ref([]);
@@ -169,15 +168,6 @@ async function loadQuizzes() {
     const { data } = await quizAPI.getQuizzes();
     quizzes.value = Array.isArray(data) ? data : [];
   } catch (e) {
-    try {
-      const { data } = await fetchQuizzes();
-      quizzes.value = Array.isArray(data) ? data : [];
-      return;
-    } catch (fallbackError) {
-      error.value =
-        fallbackError.message || "Nie uda‘'o siŽt pobraŽÅ listy quizÆˆw";
-      return;
-    }
     error.value = e.message || "Nie udało się pobrać listy quizów";
   } finally {
     loading.value = false;
