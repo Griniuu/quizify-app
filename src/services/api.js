@@ -1,6 +1,7 @@
 // src/services/api.js
 import axios from "axios";
 import { useAuth } from "../store/auth.js";
+import { useErrors } from "../store/errors.js";
 
 // Konfiguracja bazowa
 const api = axios.create({
@@ -35,55 +36,68 @@ api.interceptors.response.use(
   },
   (error) => {
     const { logout } = useAuth();
+    const errorStore = useErrors();
+    let message = "Nieznany blad";
 
     if (error.response) {
-      // Serwer odpowiedział z kodem błędu
+      // Serwer odpowiedzial z kodem bledu
       const { status, data } = error.response;
 
       switch (status) {
         case 401:
-          // Nieautoryzowany - wyloguj użytkownika
+          // Nieautoryzowany - wyloguj uzytkownika
           logout();
-          throw new Error("Sesja wygasła. Zaloguj się ponownie.");
+          message = "Sesja wygasla. Zaloguj sie ponownie.";
+          break;
 
         case 403:
-          throw new Error("Brak uprawnień do wykonania tej operacji.");
+          message = "Brak uprawnien do wykonania tej operacji.";
+          break;
 
         case 404:
-          throw new Error((data && data.message) || "Nie znaleziono zasobu.");
+          message = (data && data.message) || "Nie znaleziono zasobu.";
+          break;
 
         case 409:
-          // Konflikt - zajęty email lub nick
-          throw new Error(data.message || "Email lub nick jest już zajęty.");
+          // Konflikt - zajety email lub nick
+          message = data.message || "Email lub nick jest juz zajety.";
+          break;
 
         case 422:
-          // Błędy walidacji z serwera
+          // Bledy walidacji z serwera
           if (data.errors) {
             const messages = Object.values(data.errors).flat();
-            throw new Error(messages.join(", "));
+            message = messages.join(", ");
+            break;
           }
-          throw new Error(data.message || "Błąd walidacji danych.");
+          message = data.message || "Blad walidacji danych.";
+          break;
 
         case 429:
-          throw new Error("Zbyt wiele żądań. Spróbuj ponownie za chwilę.");
+          message = "Zbyt wiele zadan. Sprobuj ponownie za chwile.";
+          break;
 
         case 500:
-          throw new Error(
-            (data && data.message) || "Błąd serwera. Spróbuj ponownie później."
-          );
+          message = (data && data.message) || "Blad serwera. Sprobuj ponownie pozniej.";
+          break;
 
         default:
-          throw new Error(data.message || `Błąd HTTP ${status}`);
+          message = data.message || `Blad HTTP ${status}`;
+          break;
       }
     } else if (error.request) {
-      // Żądanie zostało wysłane, ale nie otrzymano odpowiedzi
-      throw new Error(
-        "Brak połączenia z serwerem. Sprawdź połączenie internetowe."
-      );
+      // Zadanie zostalo wyslane, ale nie otrzymano odpowiedzi
+      message = "Brak polaczenia z serwerem. Sprawdz polaczenie internetowe.";
     } else {
-      // Błąd w konfiguracji żądania
-      throw new Error(error.message || "Nieznany błąd");
+      // Blad w konfiguracji zadania
+      message = error.message || "Nieznany blad";
     }
+
+    if (!error.config?.suppressGlobalError) {
+      errorStore.showError(message);
+    }
+
+    return Promise.reject(new Error(message));
   }
 );
 
@@ -99,6 +113,7 @@ export const authAPI = {
 
 export const quizAPI = {
   getQuizzes: () => api.get("/quizzes"),
+  getMyQuizzes: () => api.get("/quizzes/mine"),
   getQuiz: (id) => api.get(`/quizzes/${id}`),
   answerQuiz: (id, data) => api.post(`/quizzes/${id}/answer`, data),
   createQuiz: (data) => api.post("/quizzes", data),

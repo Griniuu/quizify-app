@@ -3,7 +3,8 @@ import { reactive } from 'vue'
 
 const state = reactive({
   errors: [],
-  loading: false
+  loading: false,
+  notificationsEnabled: true
 })
 
 let errorId = 0
@@ -13,7 +14,8 @@ export function useErrors() {
     state: {
       get errors() { return state.errors },
       get loading() { return state.loading },
-      get hasErrors() { return state.errors.length > 0 }
+      get hasErrors() { return state.errors.length > 0 },
+      get notificationsEnabled() { return state.notificationsEnabled }
     },
     
     showError(message, type = 'error', duration = 5000) {
@@ -44,6 +46,18 @@ export function useErrors() {
     
     clearErrors() {
       state.errors.length = 0
+    },
+
+    setNotificationsEnabled(enabled) {
+      state.notificationsEnabled = !!enabled
+    },
+
+    toggleNotifications() {
+      state.notificationsEnabled = !state.notificationsEnabled
+      if (!state.notificationsEnabled) {
+        state.errors.length = 0
+      }
+      return state.notificationsEnabled
     },
     
     setLoading(loading) {
