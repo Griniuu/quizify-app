@@ -256,7 +256,7 @@ const isValid = computed(() => {
 });
 
 function validateQuiz() {
-  if (!quiz.value.title.trim()) return "Tytul quizu jest wymagany";
+  if (!quiz.value.title.trim()) return "Tytuł quizu jest wymagany";
   if (quiz.value.questions.length < 1) {
     return "Quiz musi miec co najmniej 1 pytanie.";
   }
