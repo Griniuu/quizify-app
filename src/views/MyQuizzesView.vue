@@ -91,7 +91,7 @@ async function loadMyQuizzes() {
       quizzes.value = Array.isArray(data) ? data : [];
     } catch (fallbackError) {
       error.value =
-        fallbackError.message || "Nie udalo sie pobrac listy quizow.";
+        fallbackError.message || "Nie udało się pobrać listy quizów.";
     }
   } finally {
     loading.value = false;
