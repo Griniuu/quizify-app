@@ -178,7 +178,6 @@ async function loadQuizzes() {
         fallbackError.message || "Nie udało się pobrać listy quizów";
       return;
     }
-    error.value = e.message || "Nie udało się pobrać listy quizów";
   } finally {
     loading.value = false;
   }
