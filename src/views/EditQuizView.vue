@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Edycja quizu</h2>
       <RouterLink to="/my-quizzes" class="btn btn-outline-secondary">
-        Powrot
+        Powrót
       </RouterLink>
     </div>
 
