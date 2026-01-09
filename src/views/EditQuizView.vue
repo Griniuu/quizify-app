@@ -49,7 +49,7 @@
                   v-model="quiz.description"
                   class="form-control"
                   rows="2"
-                  placeholder="Krotki opis quizu"
+                  placeholder="Krótki opis quizu"
                 ></textarea>
               </div>
             </div>
