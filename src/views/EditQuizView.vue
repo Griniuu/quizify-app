@@ -112,7 +112,7 @@
                         v-model="answer.text"
                         type="text"
                         class="form-control"
-                        placeholder="Odpowiedz"
+                        placeholder="Odpowiedź"
                         required
                       />
                       <button
