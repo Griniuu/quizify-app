@@ -126,8 +126,8 @@ const routes = [
     component: CreateView, 
     meta: { 
       requiresAuth: true,
-      title: 'Tworz Quiz - Quizify',
-      description: 'Tworz wlasne zestawy pytan'
+      title: 'Twórz Quiz - Quizify',
+      description: 'Twórz własne zestawy pytań'
     }
   },
   { 
