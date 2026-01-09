@@ -339,8 +339,6 @@ async function loadQuiz() {
       console.error("Błąd ładowania quizu:", fallbackError);
       return;
     }
-    error.value = err.message || "Nie udało się załadować quizu";
-    console.error("Błąd ładowania quizu:", err);
   } finally {
     loading.value = false;
   }
