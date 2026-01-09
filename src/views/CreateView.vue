@@ -53,7 +53,7 @@
 
             <!-- Lista pytań -->
             <div v-for="(question, qIndex) in quiz.questions" :key="qIndex" class="card mb-3">
-              <div class="card-header bg-light">
+              <div class="card-header bg-warning text-dark">
                 <div class="d-flex justify-content-between align-items-center">
                   <strong>Pytanie {{ qIndex + 1 }}</strong>
                   <button
@@ -137,6 +137,11 @@
       </div>
     </div>
 
+    <!-- Walidacja formularza -->
+    <div v-if="formError" class="alert alert-warning mt-4">
+      {{ formError }}
+    </div>
+
     <!-- Modal potwierdzenia -->
     <div v-if="showSuccess" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
       <div class="modal-dialog modal-dialog-centered">
@@ -162,6 +167,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const showSuccess = ref(false)
+const formError = ref('')
 
 const quiz = ref({
   title: '',
@@ -233,7 +239,11 @@ const isValid = computed(() => {
 
 // Zapisz quiz
 function saveQuiz() {
-  if (!isValid.value) return
+  const error = validateQuiz()
+  if (error) {
+    formError.value = error
+    return
+  }
   
   // Zapisz do localStorage
   const quizzes = JSON.parse(localStorage.getItem('custom_quizzes') || '[]')
@@ -248,6 +258,24 @@ function saveQuiz() {
   showSuccess.value = true
 }
 
+function validateQuiz() {
+  if (!quiz.value.title.trim()) return 'Tytul quizu jest wymagany'
+  if (quiz.value.questions.length < 1) return 'Quiz musi miec co najmniej 1 pytanie'
+  
+  const hasInvalid = quiz.value.questions.some(q => {
+    if (!q.question.trim()) return true
+    if (q.answers.length < 2) return true
+    if (!q.answers.some(a => a.isCorrect)) return true
+    return q.answers.some(a => !a.text.trim())
+  })
+  
+  if (hasInvalid) {
+    return 'Każde pytanie musi mieć min. 2 odpowiedzi i jedną poprawną'
+  }
+  
+  return ''
+}
+
 // Wyczyść formularz
 function resetForm() {
   quiz.value = {
@@ -255,13 +283,14 @@ function resetForm() {
     description: '',
     questions: []
   }
+  formError.value = ''
 }
 
 // Zamknij modal sukcesu
 function closeSuccess() {
   showSuccess.value = false
   resetForm()
-  router.push('/home')
+  router.push('/my-quizzes')
 }
 </script>
 

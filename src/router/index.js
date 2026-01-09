@@ -6,6 +6,8 @@ import QuizView from '../views/QuizView.vue'
 import QuizListView from '../views/QuizListView.vue'
 import CreateView from '../views/CreateView.vue'
 import RankingView from '../views/RankingView.vue'
+import MyQuizzesView from '../views/MyQuizzesView.vue'
+import EditQuizView from '../views/EditQuizView.vue'
 import { authGuard, guestGuard, logRouteAccess } from './guards.js'
 
 const routes = [
@@ -62,6 +64,30 @@ const routes = [
       description: 'Przeglądaj dostępne quizy'
     }
   },
+  {
+    path: '/my-quizzes',
+    name: 'my-quizzes',
+    component: MyQuizzesView,
+    meta: {
+      requiresAuth: true,
+      title: 'Moje Quizy - Quizify',
+      description: 'Twoje quizy utworzone w aplikacji'
+    }
+  },
+  {
+    path: '/quiz/:id/edit',
+    name: 'quiz-edit',
+    component: EditQuizView,
+    meta: {
+      requiresAuth: true,
+      title: 'Edycja quizu - Quizify',
+      description: 'Edycja wlasnego quizu'
+    }
+  },
+  {
+    path: '/my-quizzes/:id/edit',
+    redirect: (to) => `/quiz/${to.params.id}/edit`
+  },
   { 
     path: '/quiz', 
     name: 'quiz',
@@ -92,6 +118,16 @@ const routes = [
       title: 'Twórz Quiz - Quizify',
       description: 'Twórz własne zestawy pytań'
       // Tymczasowo wyłączone: permissions: ['quiz.create']
+    }
+  },
+  { 
+    path: '/quiz/new', 
+    name: 'quiz-new',
+    component: CreateView, 
+    meta: { 
+      requiresAuth: true,
+      title: 'Twórz Quiz - Quizify',
+      description: 'Twórz własne zestawy pytań'
     }
   },
   { 
