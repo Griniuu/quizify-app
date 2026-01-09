@@ -335,8 +335,8 @@ async function loadQuiz() {
       return;
     } catch (fallbackError) {
       error.value =
-        fallbackError.message || "Nie uda‘'o siŽt za‘'adowaŽÅ quizu";
-      console.error("B‘'Žd ‘'adowania quizu:", fallbackError);
+        fallbackError.message || "Nie udało się załadować quizu";
+      console.error("Błąd ładowania quizu:", fallbackError);
       return;
     }
     error.value = err.message || "Nie udało się załadować quizu";
