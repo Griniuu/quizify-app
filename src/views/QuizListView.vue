@@ -175,7 +175,7 @@ async function loadQuizzes() {
       return;
     } catch (fallbackError) {
       error.value =
-        fallbackError.message || "Nie uda‘'o siŽt pobraŽÅ listy quizÆˆw";
+        fallbackError.message || "Nie udało się pobrać listy quizów";
       return;
     }
     error.value = e.message || "Nie udało się pobrać listy quizów";
