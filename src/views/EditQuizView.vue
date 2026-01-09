@@ -105,7 +105,7 @@
                           :checked="answer.isCorrect"
                           @change="setCorrectAnswer(qIndex, aIndex)"
                           class="form-check-input mt-0"
-                          title="Zaznacz jako poprawna odpowiedz"
+                          title="Zaznacz jako poprawną odpowiedź"
                         />
                       </span>
                       <input
