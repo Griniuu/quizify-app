@@ -43,7 +43,7 @@
           </div>
           <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
             <small class="text-muted">
-              {{ (quiz.questions && quiz.questions.length) || 0 }} pytan
+              {{ (quiz.questions && quiz.questions.length) || 0 }} pytań
             </small>
             <div class="btn-group">
               <RouterLink :to="`/quiz/${quiz.id}`" class="btn btn-primary btn-sm">
