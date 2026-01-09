@@ -188,7 +188,7 @@ function loadQuiz() {
 
     quiz.value = JSON.parse(JSON.stringify(found));
   } catch (e) {
-    error.value = e.message || "Nie udalo sie zaladowac quizu.";
+    error.value = e.message || "Nie udało się załadować quizu.";
   } finally {
     loading.value = false;
   }
