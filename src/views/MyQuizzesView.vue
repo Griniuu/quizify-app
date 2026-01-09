@@ -20,7 +20,7 @@
     </div>
 
     <div v-else-if="error" class="alert alert-danger">
-      <h5 class="alert-heading">Blad</h5>
+      <h5 class="alert-heading">Błąd</h5>
       <p class="mb-3">{{ error }}</p>
       <button class="btn btn-outline-danger" @click="loadMyQuizzes">
         Spróbuj ponownie
