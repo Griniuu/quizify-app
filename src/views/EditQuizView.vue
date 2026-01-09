@@ -304,7 +304,7 @@ function saveQuiz() {
     localStorage.setItem("custom_quizzes", JSON.stringify(list));
     router.push("/my-quizzes");
   } catch (e) {
-    formError.value = e.message || "Nie udalo sie zapisac zmian.";
+    formError.value = e.message || "Nie udało się zapisać zmian.";
   }
 }
 
