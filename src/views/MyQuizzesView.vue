@@ -47,7 +47,7 @@
             </small>
             <div class="btn-group">
               <RouterLink :to="`/quiz/${quiz.id}`" class="btn btn-primary btn-sm">
-                Otworz
+                Otwórz
               </RouterLink>
               <RouterLink
                 :to="`/quiz/${quiz.id}/edit`"
