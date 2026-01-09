@@ -37,7 +37,7 @@ api.interceptors.response.use(
   (error) => {
     const { logout } = useAuth();
     const errorStore = useErrors();
-    let message = "Nieznany blad";
+    let message;
 
     if (error.response) {
       // Serwer odpowiedzial z kodem bledu
