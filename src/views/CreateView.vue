@@ -270,7 +270,7 @@ function validateQuiz() {
   })
   
   if (hasInvalid) {
-    return 'Kazde pytanie musi miec min. 2 odpowiedzi i jedna poprawna'
+    return 'Każde pytanie musi mieć min. 2 odpowiedzi i jedną poprawną'
   }
   
   return ''
