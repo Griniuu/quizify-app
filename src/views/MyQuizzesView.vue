@@ -23,7 +23,7 @@
       <h5 class="alert-heading">Blad</h5>
       <p class="mb-3">{{ error }}</p>
       <button class="btn btn-outline-danger" @click="loadMyQuizzes">
-        Sprobuj ponownie
+        Spróbuj ponownie
       </button>
     </div>
 
