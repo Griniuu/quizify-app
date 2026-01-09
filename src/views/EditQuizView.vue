@@ -133,7 +133,7 @@
                       + Dodaj odpowiedz
                     </button>
                     <small class="text-muted d-block mt-2">
-                      Zaznacz radio button przy poprawnej odpowiedzi
+                      Zaznacz przycisk radio przy poprawnej odpowiedzi
                     </small>
                   </div>
                 </div>
