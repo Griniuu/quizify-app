@@ -9,9 +9,9 @@
 
     <div v-if="loading" class="text-center py-4">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Ladowanie...</span>
+        <span class="visually-hidden">Ładowanie...</span>
       </div>
-      <p class="mt-3 text-muted">Ladowanie quizu...</p>
+      <p class="mt-3 text-muted">Ładowanie quizu...</p>
     </div>
 
     <div v-else-if="error" class="alert alert-danger">
