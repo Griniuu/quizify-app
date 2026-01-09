@@ -85,7 +85,7 @@
                 </div>
                 <div class="card-body">
                   <div class="mb-3">
-                    <label class="form-label">Tresc pytania *</label>
+                    <label class="form-label">Treść pytania *</label>
                     <input
                       v-model="question.question"
                       type="text"
