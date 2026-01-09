@@ -398,6 +398,7 @@ async function finishQuiz() {
         userId: effectiveUserId,
       });
     } catch (apiError) {
+      console.error("Błąd wywołania quizAPI.answerQuiz, używam fallback submitQuizAnswers:", apiError);
       response = await submitQuizAnswers(quiz.value.id, userAnswers.value);
     }
     results.value = response.data;
