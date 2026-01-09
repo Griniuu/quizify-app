@@ -7,7 +7,7 @@
           Nowy quiz
         </RouterLink>
         <RouterLink to="/home" class="btn btn-outline-secondary">
-          Powrot
+          Powrót
         </RouterLink>
       </div>
     </div>
